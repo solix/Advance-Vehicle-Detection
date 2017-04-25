@@ -4,6 +4,11 @@ import numpy as np
 import pickle
 import cv2
 from helper import *
+import glob
+import time
+from scipy.ndimage.measurements import label
+from Cachedata import  Cachedata
+
 
 dist_pickle = pickle.load( open("dist.pkl", "rb" ) )
 svc = dist_pickle["svc"]
@@ -14,13 +19,16 @@ cell_per_block = dist_pickle["cell_per_block"]
 spatial_size = dist_pickle["spatial_size"]
 hist_bins = dist_pickle["hist_bins"]
 
-img = mpimg.imread('test_images/test1.jpg')
+# img = mpimg.imread('test_images/test1.jpg')
+history = Cachedata()
 
 # Define a single function that can extract features using hog sub-sampling and make predictions
 def find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins):
     
     draw_img = np.copy(img)
     img = img.astype(np.float32)/255
+    heatmap = np.zeros_like(img[:,:,0]).astype(np.float)
+
     
     img_tosearch = img[ystart:ystop,:,:]
     ctrans_tosearch = convert_color(img_tosearch, conv='RGB2YCrCb')
@@ -67,9 +75,9 @@ def find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, ce
             # Get color features
             spatial_features = bin_spatial(subimg, size=spatial_size)
             hist_features = color_hist(subimg, nbins=hist_bins)
-            print('spa {}'.format(spatial_features.shape)) 
-            print('hist {}'.format(hist_features.shape))
-            print('hog {}'.format(hog_features.shape))
+            # print('spa {}'.format(spatial_features.shape)) 
+            # print('hist {}'.format(hist_features.shape))
+            # print('hog {}'.format(hog_features.shape))
             # Scale features and make a prediction
             test_features = X_scaler.transform(np.hstack((spatial_features, hist_features, hog_features)))
             #test_features = X_scaler.transform(np.hstack((shape_feat, hist_feat)).reshape(1, -1))    
@@ -80,14 +88,39 @@ def find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, ce
                 ytop_draw = np.int(ytop*scale)
                 win_draw = np.int(window*scale)
                 cv2.rectangle(draw_img,(xbox_left, ytop_draw+ystart),(xbox_left+win_draw,ytop_draw+win_draw+ystart),(0,0,255),6) 
+                #image_boxes.append(((xbox_left,ytop_draw+ystart),(xbox_left+win_draw,ytop_draw+win_draw+ystart)))
+                heatmap[ytop_draw+ystart:ytop_draw+win_draw+ystart,xbox_left:xbox_left+win_draw]+= 1
+                # Apply threshold to help remove false positives
+                # heatmap = apply_threshold(heatmap)
+                # history.recent_heatmap.append(heat)
                 
-    return draw_img
-    
-ystart = 400
-ystop = 656
-scale = 1.5
-       
-out_img = find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins)
+            # avg_heat = np.mean(history.recent_heatmap,axis=0)
 
-plt.imshow(out_img)
-plt.show()
+    return draw_img,heatmap#,image_boxes
+    
+
+       
+# # out_img = find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins)
+# file = glob.glob('./test_images/*')
+# ystart = 400
+# ystop = 656
+# scale = 1.5
+# images = []
+# titles = []
+# image_boxes = []
+
+# for src in file:
+#     img = mpimg.imread(src)
+#     # plt.imshow(out_img)
+#     # plt.show()
+#     t1 = time.time()
+#     draw_img = np.copy(img)
+#     images.append(img)
+#     titles.append('')
+#     window_img,_,_ = find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins)
+#     images.append(window_img)
+#     titles.append('')
+# #     print(time-t1,' seconds to draw images on searching  ',len(windows),' windows')
+    
+# fig = plt.figure(figsize=(6,12),dpi=300) 
+# visualize(fig,4,3,images,titles)

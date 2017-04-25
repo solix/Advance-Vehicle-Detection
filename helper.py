@@ -3,6 +3,8 @@ import numpy as np
 import cv2
 from skimage.feature import hog
 import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
+
 # Define a function to return some characteristics of the dataset 
 def data_look(car_list, notcar_list):
     data_dict = {}
@@ -73,6 +75,7 @@ def visualize(fig,rows,cols,imgs,titles):
         
         plt.subplot(rows,cols,i+1)
         plt.title(i+1)
+        plt.axis('off')
         img_dim = len(img.shape)
         if(img_dim < 3):
             plt.imshow(img,cmap='hot')
@@ -80,6 +83,7 @@ def visualize(fig,rows,cols,imgs,titles):
         else:
             plt.imshow(img)
             plt.title(titles[i])
+    plt.show()        
             
 # Define a function to extract features from a list of images
 # Have this function call bin_spatial() and color_hist()
@@ -131,4 +135,36 @@ def extract_features(imgs, color_space='RGB', spatial_size=(32, 32),
             file_features.append(hog_features)
         features.append(np.concatenate(file_features))
     # Return list of feature vectors
-    return features            
+    return features    
+
+
+def add_heat(heatmap, bbox_list):
+    # Iterate through list of bboxes
+    for box in bbox_list:
+        # Add += 1 for all pixels inside each bbox
+        # Assuming each "box" takes the form ((x1, y1), (x2, y2))
+        heatmap[box[0][1]:box[1][1], box[0][0]:box[1][0]] += 1
+
+    # Return updated heatmap
+    return heatmap# Iterate through list of bboxes
+    
+def apply_threshold(heatmap, threshold = 2):
+    # Zero out pixels below the threshold
+    heatmap[heatmap <= threshold] = 0
+    # Return thresholded map
+    return heatmap
+
+def draw_labeled_bboxes(img, labels):
+    # Iterate through all detected cars
+    for car_number in range(1, labels[1]+1):
+        # Find pixels with each car_number label value
+        nonzero = (labels[0] == car_number).nonzero()
+        # Identify x and y values of those pixels
+        nonzeroy = np.array(nonzero[0])
+        nonzerox = np.array(nonzero[1])
+        # Define a bounding box based on min/max x and y
+        bbox = ((np.min(nonzerox), np.min(nonzeroy)), (np.max(nonzerox), np.max(nonzeroy)))
+        # Draw the box on the image
+        cv2.rectangle(img, bbox[0], bbox[1], (0,0,255), 6)
+    # Return the image
+    return img
