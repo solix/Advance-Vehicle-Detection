@@ -37,7 +37,7 @@ def find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, ce
     nyblocks = (ch1.shape[0] // pix_per_cell)-1 
     nfeat_per_block = orient*cell_per_block**2
     # 64 was the orginal sampling rate, with 8 cells and 8 pix per cell
-    window = 32
+    window = 64
     nblocks_per_window = (window // pix_per_cell)-1 
     cells_per_step = 2  # Instead of overlap, define how many cells to step
     nxsteps = (nxblocks - nblocks_per_window) // cells_per_step
@@ -71,7 +71,7 @@ def find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, ce
             print('hist {}'.format(hist_features.shape))
             print('hog {}'.format(hog_features.shape))
             # Scale features and make a prediction
-            test_features = X_scaler.transform(np.hstack((spatial_features, hist_features, hog_features))).reshape(1,-1)
+            test_features = X_scaler.transform(np.hstack((spatial_features, hist_features, hog_features)))
             #test_features = X_scaler.transform(np.hstack((shape_feat, hist_feat)).reshape(1, -1))    
             test_prediction = svc.predict(test_features)
             
@@ -86,7 +86,8 @@ def find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, ce
 ystart = 400
 ystop = 656
 scale = 1.5
-    
+       
 out_img = find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins)
 
 plt.imshow(out_img)
+plt.show()

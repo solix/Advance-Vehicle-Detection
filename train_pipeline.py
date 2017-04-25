@@ -1,4 +1,55 @@
 import pickle
+#import packages
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+import numpy as np
+import cv2
+import tqdm as loadbar
+import glob
+import os
+import time
+from skimage.feature import hog
+from sklearn.svm import LinearSVC
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from helper import *
+
+
+#import cars vs non cars data seperately
+base_dir = "../../../../../Volumes/Solix/Datasets/car-vs-noneCar/vehicles/"
+
+image_types = os.listdir(base_dir)
+cars=[]
+
+for im_type in image_types:
+    cars.extend(glob.glob(base_dir+im_type+'/*'))
+    
+    
+print('number of cars: ' + str(len(cars)))
+
+with open("cars.txt",'w') as f:
+    for fn in cars:
+        f.write(fn+'\n')
+
+base_dir = "../../../../../Volumes/Solix/Datasets/car-vs-noneCar/non-vehicles/"
+image_types = os.listdir(base_dir)
+not_cars=[]
+
+for im_type in image_types:
+    not_cars.extend(glob.glob(base_dir+im_type+'/*'))
+
+
+print('number of non-cars: ' + str(len(not_cars)))
+
+with open("notcars.txt",'w') as f:
+    for fn in cars:
+        f.write(fn+'\n')
+
+
+
+
+
+
 color_space = 'YCrCb'
 orient = 9
 pixel_per_cell = 8
