@@ -45,7 +45,7 @@ def process(img):
 	cv2.putText(output1, 'Heatmap', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (125, 255, 12), 2)
 	cv2.putText(output2, 'Heatmap-avg', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (125, 255, 12), 2)
 	cv2.putText(output3, 'Heatmap-thresh', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (125, 255, 12), 2)
-	cv2.putText(output4, 'multi-window with outlier', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (125, 255, 12), 2)
+	cv2.putText(output4, 'multi-window detection', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (125, 255, 12), 2)
 
    
 	vis = np.zeros((720, 1280, 3))
