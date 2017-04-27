@@ -1,4 +1,4 @@
-##Writeup by Soheil Jahanshahi
+## Writeup by Soheil Jahanshahi
 
 **Vehicle Detection Project**
 
@@ -20,7 +20,7 @@ The goals / steps of this project are the following:
 [video1]: ./project_video.mp4
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/513/view) Points
-###Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
+### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
 
 The project implementation consist of following files:
 
@@ -31,9 +31,9 @@ The project implementation consist of following files:
 * `tracker.py`: tracking algorithm for detecting vehicles in the video
 
 
-###Histogram of Oriented Gradients (HOG)
+### Histogram of Oriented Gradients (HOG)
 
-####1. Explain how (and identify where in your code) you extracted HOG features from the training images.
+#### 1. Explain how (and identify where in your code) you extracted HOG features from the training images.
 
 The code for this step is contained in lines 19 through 93 of the file called `train_pipeline.py`).  
 
@@ -44,11 +44,11 @@ Above operation is applied using function `get_hog_feature` found in line `34` o
 
 It was interesting to see in the image that car_hog feature represents clearly a car and that is a good feature for training our model. 
 
-####2. Explain how you settled on your final choice of HOG parameters.
+#### 2. Explain how you settled on your final choice of HOG parameters.
 
 I tried various combinations of parameters for hog feature with different channels with various orientation values and pixel per cell. My final choice of parameters for hog features were as follows`orientations=9`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`. You can find these values in lines 54 through 56 of the file called `train_pipeline.py`. 
 
-####3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
+#### 3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
 I decided to use a linear SVM using all three hog, histogram and spatial features have a look at parameters:
 
@@ -65,15 +65,16 @@ I used the features that I extracted using `extract_features` function from `hel
 ![alt text][image2]
 
 Testing accuracy of almost 99 percent was a satisfiable result to proceed testing on unseen data. I stored all the parameters I used during training with `SVC` in a pickle file to use for the test images and video frames.
-###Sliding Window Search
+### Sliding Window Search
 
-####1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
+#### 1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
 The code for this step is `find_cars` function contained in lines 26 through 99 of the file called `subsample_pipeline.py`). 
 
 As recommended in lecture, to avoid slow computing by sliding window and calculating hog features each time, Instead of recomputing hog when we have a new image, efficient way is taking hog feature for entire image only once and subsampling that to extract feature for each window. I defined `ystart = 400` and `ystop=656` for y direction in the image because out region of interest are cars which are naturally on the road, we don't restrict the x axes. I also set a `scale =1.5` its a trick for searching different window sizes, it will scale the entire image and apply hog and then subsample, this will resample different window sizes. The function pipeline will extract hog, spatial feature and then predict those on trained `svc` model. If we got a correct prediction then we draw a box around detected match with given `scale`. Result is good but classifier also detected some false positive detection on test images shown in the fifth row.
+
 ![alt text][image3]
 
-####2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
+#### 2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
 To optimise the classifier and identifying overlapping and false positives I explored test images by applying heat map to each test image, This is when there is a correct prediction we will add heat to the heat map image in the area we found a car, since we have different scale we will have overlapping bounding boxes. Visualisation of these step with heat map results like this: 
 
@@ -84,12 +85,12 @@ The heat map that we are generating shows the hot spots in the heatmap let us dr
 
 ### Video Implementation
 
-####1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
+#### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
 Here's a [link to my video result](./tracked_video.mp4)
 <iframe width="850" height="415" src="./tracked_video.mp4" frameborder="0" ></iframe>
 
 
-####2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
+#### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
 The code for this step is `process` function contained in lines 30 through 58 of the file called `track.py`). 
 
 For the video process in order to get a less wobbly effect , I have created a class called `CacheData` to keep track of last `3` heat maps that are detected in the previous frames and average it when drawing boxes, this number is result of experimenting `5`, `10` , `15` frames. I have used similar parameters for hog and window sizes. To get rid of false positive after averaging the heat maps over last `3` frames, I thresholded that heat map set to `threshold = 1`. 
@@ -106,9 +107,9 @@ Here's an example result showing the heatmap from a series of frames of video, t
 
 ---
 
-###Discussion
+### Discussion
 
-####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
+#### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
 Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
 
