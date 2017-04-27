@@ -37,7 +37,7 @@ The project implementation consist of following files:
 
 The code for this step is contained in lines 19 through 93 of the file called `train_pipeline.py`).  
 
-I started by importing dataset for `vehicles` and `non-vehicles` and explored some examples, then I started to visualise hog features that I tried to extract and I visualised a random sample from dataset it like this: 
+I started by importing dataset for `vehicles` and `non-vehicles` and explored some examples, then I started to visualise hog features that I tried to extract. I visualised it like this: 
 ![alt text][image1]
 
 Above operation is applied using function `get_hog_feature` found in line `34` of `helper.py` file. I then explored different color spaces `YCrCb` has shown the best result. HOG parameters of `orientations=9`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)` . 
@@ -61,7 +61,7 @@ I decided to use a linear SVM using all three hog, histogram and spatial feature
 | hog channel | ALL|
 | spatial size | (64 x 64) |
 
-I used the features that I extracted using `extract_features` function from `helper.py`  and applied the scaler function using `StandardScaler()` from sklearn to  normalise the data and then I transform to each feature vector that I stacked together using `StandardScaler().transform`, besides I also generate labels for cars and non-car. After data is preprocessed , data is splitter into training and test data with `train_test_split` sklearn .  I then created an SVM and ran  training on training data. The result came up as follows :
+I used the features that I extracted using `extract_features` function from `helper.py`  and applied the scaler function using `StandardScaler()` from sklearn to  normalise the data and then I transform to each feature vector that I stacked together using `StandardScaler().transform`, besides I also generate labels for cars and non-car. After data is preprocessed , data is splitter into training and test data with `train_test_split` sklearn .  I then created an SVM and ran  training on training data. The result came up as follows when trained on my machine :
 ![alt text][image2]
 
 Testing accuracy of almost 99 percent was a satisfiable result to proceed testing on unseen data. I stored all the parameters I used during training with `SVC` in a pickle file to use for the test images and video frames.
